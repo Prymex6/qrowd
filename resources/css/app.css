@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   System wizualny QRowd - te same tokeny, co w makietach w katalogu makiety/.
+   Motyw ciemny ZAWSZE: na imprezie jest ciemno, bialy ekran oslepia.
+--------------------------------------------------------------------------- */
+@theme {
+    --color-base:           #0B0B12;
+    --color-surface:  #15151F;
+    --color-surface2: #1E1E2B;
+    --color-line:   rgba(255, 255, 255, 0.08);
+    --color-ink:         #FFFFFF;
+    --color-muted:        #9B9BAF;
+    --color-accent-from:     #FF2D78;
+    --color-accent-to:     #7B2DFF;
+    --color-fire-from:      #FF7A1A;
+    --color-fire-to:      #FFC414;
+    --color-success:        #22E07A;
+    --color-warning:   #FFB020;
+    --color-error:          #FF4D4D;
+
+    --font-grotesk: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+    --font-inter:   "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+    html { -webkit-tap-highlight-color: transparent; }
+
+    body {
+        font-family: var(--font-inter);
+        background: var(--color-base);
+        color: var(--color-ink);
+        overscroll-behavior-y: none;
+    }
+
+    .font-grotesk { font-family: var(--font-grotesk); letter-spacing: -0.02em; }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--color-base); }
+    ::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 999px; }
+}
+
+@layer components {
+    .grad         { background: linear-gradient(135deg, #FF2D78, #7B2DFF); }
+    .grad-fire    { background: linear-gradient(135deg, #FF7A1A, #FFC414); }
+    .grad-text {
+        background: linear-gradient(135deg, #FF2D78, #7B2DFF);
+        -webkit-background-clip: text; background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .glow       { box-shadow: 0 8px 40px rgba(255, 45, 120, 0.28); }
+    .glow-fire { box-shadow: 0 8px 40px rgba(255, 122, 26, 0.30); }
+    .card {
+        background: var(--color-surface);
+        border: 1px solid var(--color-line);
+        border-radius: 20px;
+    }
+    /* Everything a guest touches is at least 56px - used one-handed, in the dark,
+       three drinks in. That is not a joke, it is a design requirement. */
+    .tap { min-height: 56px; }
+}
+
+@keyframes pulse-live { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+.pulse-live { animation: pulse-live 1.5s ease-in-out infinite; }
+
+@keyframes eq { 0%, 100% { height: 6px; } 25% { height: 26px; } 50% { height: 12px; } 75% { height: 22px; } }
+.eq-bar {
+    width: 4px; border-radius: 2px;
+    background: linear-gradient(180deg, #FF2D78, #7B2DFF);
+    animation: eq 0.7s ease-in-out infinite;
+}
+
+@keyframes blobs {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%      { transform: translate(40px, -30px) scale(1.15); }
+}
+.blob {
+    position: fixed; border-radius: 9999px; filter: blur(90px);
+    opacity: 0.16; pointer-events: none; z-index: 0;
+    animation: blobs 14s ease-in-out infinite;
+}
+
+@keyframes hype-bump {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.25); }
+    100% { transform: scale(1); }
+}
+.hype-bump { animation: hype-bump 0.4s ease-out; }
