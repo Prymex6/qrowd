@@ -49,7 +49,7 @@ class LocalLibraryTest extends PartyTestCase
         ]);
     }
 
-    private function utworZDysku(User $host, array $n = []): CatalogTrack
+    private function trackOnDisk(User $host, array $n = []): CatalogTrack
     {
         $p = $this->pozycja($n);
 
@@ -111,7 +111,7 @@ class LocalLibraryTest extends PartyTestCase
     public function test_the_first_batch_starts_the_library_over(): void
     {
         $host = User::factory()->create();
-        $this->utworZDysku($host, ['path' => 'Stare/Usuniety.mp3']);
+        $this->trackOnDisk($host, ['path' => 'Stare/Usuniety.mp3']);
 
         $this->wyslijSpis($host, [$this->pozycja()], first: true)->assertOk();
 
@@ -169,7 +169,7 @@ class LocalLibraryTest extends PartyTestCase
         $mine = User::factory()->create();
         $stranger = User::factory()->create();
 
-        $this->utworZDysku($stranger, ['path' => 'Obcy/Cudzy utwor.mp3', 'title' => 'Chwile obce']);
+        $this->trackOnDisk($stranger, ['path' => 'Obcy/Cudzy utwor.mp3', 'title' => 'Chwile obce']);
 
         $party = Party::factory()->settings(['music_source' => 'disk'])
             ->create(['user_id' => $mine->id]);
@@ -182,7 +182,7 @@ class LocalLibraryTest extends PartyTestCase
         $mine = User::factory()->create();
         $stranger = User::factory()->create();
 
-        $this->utworZDysku($stranger, ['path' => 'Obcy/Cudzy.mp3']);
+        $this->trackOnDisk($stranger, ['path' => 'Obcy/Cudzy.mp3']);
 
         $this->wyslijSpis($mine, [$this->pozycja()], first: true)->assertOk();
 
@@ -193,7 +193,7 @@ class LocalLibraryTest extends PartyTestCase
     public function test_a_host_can_forget_their_own_library(): void
     {
         $host = User::factory()->create();
-        $this->utworZDysku($host);
+        $this->trackOnDisk($host);
         $host->forceFill(['music_folder' => 'Muzyka'])->save();
 
         $this->actingAs($host)->deleteJson('/host/muzyka')->assertOk();
@@ -207,7 +207,7 @@ class LocalLibraryTest extends PartyTestCase
     public function test_disk_mode_shows_only_the_hosts_library(): void
     {
         $host = User::factory()->create();
-        $this->utworZDysku($host);
+        $this->trackOnDisk($host);
         CatalogTrack::factory()->create(['title' => 'Chwile z YouTube', 'artist' => 'Ktos']);
 
         $party = Party::factory()->settings(['music_source' => 'disk'])
@@ -222,7 +222,7 @@ class LocalLibraryTest extends PartyTestCase
     public function test_youtube_mode_lets_in_no_files_from_disk(): void
     {
         $host = User::factory()->create();
-        $this->utworZDysku($host);
+        $this->trackOnDisk($host);
         CatalogTrack::factory()->create(['title' => 'Chwile z YouTube', 'artist' => 'Ktos']);
 
         $party = Party::factory()->settings(['music_source' => 'youtube'])
@@ -238,7 +238,7 @@ class LocalLibraryTest extends PartyTestCase
     public function test_disk_mode_never_reaches_out_to_youtube(): void
     {
         $host = User::factory()->create();
-        $this->utworZDysku($host);
+        $this->trackOnDisk($host);
 
         $party = Party::factory()->settings(['music_source' => 'disk'])
             ->create(['user_id' => $host->id]);
@@ -254,7 +254,7 @@ class LocalLibraryTest extends PartyTestCase
     public function test_a_disk_submission_carries_the_file_path(): void
     {
         $host = User::factory()->create();
-        $track = $this->utworZDysku($host);
+        $track = $this->trackOnDisk($host);
 
         $party = Party::factory()->settings(['music_source' => 'disk'])
             ->create(['user_id' => $host->id, 'status' => 'live']);
@@ -286,11 +286,11 @@ class LocalLibraryTest extends PartyTestCase
         $this->assertNull($party->queueItems()->first()->local_path);
     }
 
-    /** Odtwarzacz dostaje sciezke wzgledna - otworzy plik sam, przez uchwyt. */
+    /** The player gets a relative path and opens the file itself, by handle. */
     public function test_the_player_receives_a_path_not_a_server_url(): void
     {
         $host = User::factory()->create();
-        $track = $this->utworZDysku($host);
+        $track = $this->trackOnDisk($host);
 
         $party = Party::factory()->settings(['music_source' => 'disk'])
             ->create(['user_id' => $host->id, 'status' => 'live']);

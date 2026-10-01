@@ -165,7 +165,7 @@ Route::middleware('auth')->prefix('host')->name('host.')->group(function () {
         Route::post('/harmonogram/szablon', [ScheduleController::class, 'loadTemplate'])->name('schedule.template');
         Route::delete('/harmonogram/{item}', [ScheduleController::class, 'destroy'])->name('schedule.delete');
 
-        // Sterowanie na zywo - wolane z panelu przez fetch, zwraca stan JSON.
+        // Live control - called from the panel by fetch, answers with JSON state.
         Route::prefix('api')->name('api.')->group(function () {
             Route::get('state', [LiveController::class, 'state'])->name('state');
             Route::post('status', [LiveController::class, 'status'])->name('status');

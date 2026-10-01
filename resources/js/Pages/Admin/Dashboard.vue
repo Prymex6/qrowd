@@ -13,7 +13,7 @@ const quotaColour = computed(() => {
     return 'text-success';
 });
 
-// Ile zapytan catalogue obsluzyl za darmo - dowod, ze architektura sie broni.
+// How many searches the catalogue answered for free - the argument for it.
 const catalogueShare = computed(() => {
     const fromCatalogue = props.cache.hits;
     const fromYouTube = props.limit.searches_made;

@@ -194,7 +194,7 @@ class PaymentsTest extends TestCase
         $payment = $this->order();
 
         $obce = $this->notification($payment, ['ID_ZAMOWIENIA' => 'QR-NIE-MA-TAKIEGO']);
-        // Przeliczamy podpis dla podmienionego numeru.
+        // Recompute the signature for the swapped number.
         $obce['HASH'] = hash('sha256', implode(';', [
             self::PASSWORD, $obce['KWOTA'], $obce['ID_PLATNOSCI'],
             $obce['ID_ZAMOWIENIA'], $obce['STATUS'], $obce['SECURE'], self::SECRET,

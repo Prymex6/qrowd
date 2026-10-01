@@ -48,7 +48,7 @@ class CatalogImporter
     /**
      * Importuje cala publiczna playliste YouTube do katalogu.
      *
-     * @return array{dodane:int, zaktualizowane:int, pominiete:int, jednostki:int}
+     * @return array{added:int, zaktualizowane:int, pominiete:int, jednostki:int}
      */
     public function importPlaylist(string $playlistId, ?string $genre = null, bool $weddingSafe = true, int $maxItems = 0): array
     {
@@ -116,7 +116,7 @@ class CatalogImporter
      */
     public function store(array $tracks, ?string $genre = null, bool $weddingSafe = true): array
     {
-        $dodane = 0;
+        $added = 0;
         $updated = 0;
 
         foreach ($tracks as $track) {
@@ -168,11 +168,11 @@ class CatalogImporter
                     'youtube_id' => $track['youtube_id'],
                     'source' => 'seed',
                 ]);
-                $dodane++;
+                $added++;
             }
         }
 
-        return ['added' => $dodane, 'updated' => $updated];
+        return ['added' => $added, 'updated' => $updated];
     }
 
     /**

@@ -37,7 +37,7 @@ class PartyConductor
     /**
      * Ends the current track and decides what plays next.
      *
-     * @return array{utwor: ?QueueItem, powod: string, komunikat: ?string}
+     * @return array{track: ?QueueItem, reason: string, message: ?string}
      */
     public function next(): array
     {

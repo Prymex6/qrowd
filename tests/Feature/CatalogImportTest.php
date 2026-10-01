@@ -27,7 +27,7 @@ class CatalogImportTest extends TestCase
         config(['services.youtube.key' => 'klucz-testowy']);
     }
 
-    private function utwor(array $n = []): array
+    private function track(array $n = []): array
     {
         return array_merge([
             'youtube_id' => 'abcdefghijk',
@@ -54,12 +54,12 @@ class CatalogImportTest extends TestCase
     {
         $importer = CatalogImporter::make();
 
-        $importer->store([$this->utwor()]);
+        $importer->store([$this->track()]);
 
         $this->assertSame(1_200_000, CatalogTrack::first()->view_count);
 
         // This time YouTube returned neither statistics nor a channel id.
-        $importer->store([$this->utwor(['view_count' => null, 'channel_id' => null])]);
+        $importer->store([$this->track(['view_count' => null, 'channel_id' => null])]);
 
         $track = CatalogTrack::first();
 
@@ -71,11 +71,11 @@ class CatalogImportTest extends TestCase
     public function test_every_check_updates_the_checked_marker(): void
     {
         $importer = CatalogImporter::make();
-        $importer->store([$this->utwor()]);
+        $importer->store([$this->track()]);
 
         CatalogTrack::first()->forceFill(['checked_at' => now()->subYear()])->save();
 
-        $importer->store([$this->utwor(['view_count' => null])]);
+        $importer->store([$this->track(['view_count' => null])]);
 
         $this->assertTrue(CatalogTrack::first()->checked_at->isToday());
     }
@@ -84,11 +84,11 @@ class CatalogImportTest extends TestCase
     public function test_a_refresh_does_not_rewrite_provenance(): void
     {
         $importer = CatalogImporter::make();
-        $importer->store([$this->utwor()]);
+        $importer->store([$this->track()]);
 
         CatalogTrack::first()->forceFill(['source' => 'manual'])->save();
 
-        $importer->store([$this->utwor()]);
+        $importer->store([$this->track()]);
 
         $this->assertSame('manual', CatalogTrack::first()->source);
     }
@@ -97,10 +97,10 @@ class CatalogImportTest extends TestCase
     {
         $importer = CatalogImporter::make();
 
-        $importer->store([$this->utwor()], 'disco-polo');
+        $importer->store([$this->track()], 'disco-polo');
         $this->assertSame('disco-polo', CatalogTrack::first()->genre);
 
-        $importer->store([$this->utwor()]);
+        $importer->store([$this->track()]);
         $this->assertSame('disco-polo', CatalogTrack::first()->genre);
     }
 
@@ -111,11 +111,11 @@ class CatalogImportTest extends TestCase
         $importer = CatalogImporter::make();
 
         $importer->store([
-            $this->utwor(['youtube_id' => 'aaaaaaaaaaa', 'title' => 'Relaks 1 hour']),
-            $this->utwor(['youtube_id' => 'bbbbbbbbbbb', 'title' => 'Disco polo skladanka']),
-            $this->utwor(['youtube_id' => 'ccccccccccc', 'duration_seconds' => 30]),
-            $this->utwor(['youtube_id' => 'ddddddddddd', 'duration_seconds' => 1800]),
-            $this->utwor(['youtube_id' => 'eeeeeeeeeee', 'is_embeddable' => false]),
+            $this->track(['youtube_id' => 'aaaaaaaaaaa', 'title' => 'Relaks 1 hour']),
+            $this->track(['youtube_id' => 'bbbbbbbbbbb', 'title' => 'Disco polo skladanka']),
+            $this->track(['youtube_id' => 'ccccccccccc', 'duration_seconds' => 30]),
+            $this->track(['youtube_id' => 'ddddddddddd', 'duration_seconds' => 1800]),
+            $this->track(['youtube_id' => 'eeeeeeeeeee', 'is_embeddable' => false]),
         ]);
 
         $this->assertSame(0, CatalogTrack::count());
@@ -129,7 +129,7 @@ class CatalogImportTest extends TestCase
     {
         $importer = CatalogImporter::make();
 
-        $importer->store([$this->utwor([
+        $importer->store([$this->track([
             'title' => "Chwile ulotne \xED\xA0\x80 remix",
             'artist' => "Sanah\xED\xA0\x80",
         ])]);

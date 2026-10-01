@@ -19,9 +19,9 @@ use Illuminate\Http\Request;
 class GuestDevice
 {
     /**
-     * Wzorce telefonow i tabletow. Celowo szeroka lista - falszywe
-     * "to telefon" jest nieszkodliwe, falszywe "to komputer" wycina
-     * kogos z liczenia sali.
+     * Phone and tablet patterns. Deliberately broad: a false "this is a
+     * phone" costs nothing, while a false "this is a desktop" drops someone
+     * out of the headcount for the room.
      */
     private const MOBILE = [
         'Android', 'iPhone', 'iPad', 'iPod', 'Mobile', 'Opera Mini',

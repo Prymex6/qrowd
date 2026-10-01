@@ -34,7 +34,7 @@ class MakeDemoParty extends Command
             'starts_at' => now(),
         ]);
 
-        // Na weselu moderacja jest domyslnie wlaczona - do testow przeszkadza.
+        // Moderation is on by default at a wedding, which gets in the way here.
         $party->updateSettings(['moderation' => false]);
 
         $this->newLine();

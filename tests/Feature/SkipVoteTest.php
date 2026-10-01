@@ -27,7 +27,7 @@ class SkipVoteTest extends PartyTestCase
      * A party with a track playing, something in the queue and the given number
      * of guests present in the room. Returns [party, playing track, guest keys].
      */
-    private function impreza(int $active, array $settings = []): array
+    private function party(int $active, array $settings = []): array
     {
         $party = Party::factory()->settings($settings + [
             'skip_vote_enabled' => true,
@@ -53,7 +53,7 @@ class SkipVoteTest extends PartyTestCase
 
     public function test_a_vote_does_not_skip_until_the_threshold_is_met(): void
     {
-        [$party, $playing, $keys] = $this->impreza(8);   // prog: ceil(8 * 0,75) = 6
+        [$party, $playing, $keys] = $this->party(8);   // prog: ceil(8 * 0,75) = 6
 
         $this->asGuest($keys[0])->postJson("/api/p/{$party->code}/skip-vote")
             ->assertOk()
@@ -66,7 +66,7 @@ class SkipVoteTest extends PartyTestCase
 
     public function test_crossing_the_threshold_moves_to_the_next_track(): void
     {
-        [$party, $playing, $keys] = $this->impreza(4);   // prog: ceil(4 * 0,75) = 3
+        [$party, $playing, $keys] = $this->party(4);   // prog: ceil(4 * 0,75) = 3
 
         foreach (array_slice($keys, 0, 2) as $k) {
             $this->asGuest($k)->postJson("/api/p/{$party->code}/skip-vote")->assertOk();
@@ -87,7 +87,7 @@ class SkipVoteTest extends PartyTestCase
      */
     public function test_votes_do_not_carry_over_to_the_next_track(): void
     {
-        [$party, $playing, $keys] = $this->impreza(4);
+        [$party, $playing, $keys] = $this->party(4);
 
         foreach (array_slice($keys, 0, 3) as $k) {
             $this->asGuest($k)->postJson("/api/p/{$party->code}/skip-vote");
@@ -106,7 +106,7 @@ class SkipVoteTest extends PartyTestCase
 
     public function test_the_same_guest_cannot_vote_twice(): void
     {
-        [$party, $playing, $keys] = $this->impreza(8);
+        [$party, $playing, $keys] = $this->party(8);
 
         $this->asGuest($keys[0])->postJson("/api/p/{$party->code}/skip-vote");
         $this->asGuest($keys[0])->postJson("/api/p/{$party->code}/skip-vote")
@@ -122,7 +122,7 @@ class SkipVoteTest extends PartyTestCase
      */
     public function test_the_threshold_counts_only_guests_present_in_the_room(): void
     {
-        [$party, $playing, $keys] = $this->impreza(4);
+        [$party, $playing, $keys] = $this->party(4);
 
         Guest::factory()->count(40)->create([
             'party_id' => $party->id,
@@ -143,7 +143,7 @@ class SkipVoteTest extends PartyTestCase
      */
     public function test_the_only_person_in_the_room_can_skip(): void
     {
-        [$party, $playing, $keys] = $this->impreza(1);   // ceil(1 * 0,75) = 1
+        [$party, $playing, $keys] = $this->party(1);   // ceil(1 * 0,75) = 1
 
         $this->asGuest($keys[0])->postJson("/api/p/{$party->code}/skip-vote")
             ->assertOk()
@@ -156,7 +156,7 @@ class SkipVoteTest extends PartyTestCase
     /** Kto chce twardszego zabezpieczenia, podnosi suwak w ustawieniach. */
     public function test_a_raised_vote_floor_is_honoured(): void
     {
-        [$party, $playing, $keys] = $this->impreza(4, ['skip_vote_min' => 4]);
+        [$party, $playing, $keys] = $this->party(4, ['skip_vote_min' => 4]);
 
         foreach (array_slice($keys, 0, 3) as $k) {
             $this->asGuest($k)->postJson("/api/p/{$party->code}/skip-vote")
@@ -175,7 +175,7 @@ class SkipVoteTest extends PartyTestCase
      */
     public function test_the_threshold_never_exceeds_the_people_present(): void
     {
-        [$party, $playing, $keys] = $this->impreza(2, ['skip_vote_min' => 10]);
+        [$party, $playing, $keys] = $this->party(2, ['skip_vote_min' => 10]);
 
         $this->asGuest($keys[0])->postJson("/api/p/{$party->code}/skip-vote")
             ->assertOk()
@@ -185,7 +185,7 @@ class SkipVoteTest extends PartyTestCase
 
     public function test_skip_voting_when_disabled_does_nothing(): void
     {
-        [$party, $playing, $keys] = $this->impreza(4, ['skip_vote_enabled' => false]);
+        [$party, $playing, $keys] = $this->party(4, ['skip_vote_enabled' => false]);
 
         foreach ($keys as $k) {
             $this->asGuest($k)->postJson("/api/p/{$party->code}/skip-vote")
@@ -198,7 +198,7 @@ class SkipVoteTest extends PartyTestCase
 
     public function test_a_banned_guest_cannot_vote(): void
     {
-        [$party, $playing, $keys, $guests] = $this->impreza(4);
+        [$party, $playing, $keys, $guests] = $this->party(4);
 
         // We ban exactly the guest who is about to vote.
         $guests[0]->update(['is_banned' => true]);
@@ -211,14 +211,14 @@ class SkipVoteTest extends PartyTestCase
 
     public function test_voting_requires_joining_the_party(): void
     {
-        [$party] = $this->impreza(4);
+        [$party] = $this->party(4);
 
         $this->postJson("/api/p/{$party->code}/skip-vote")->assertForbidden();
     }
 
     public function test_a_paused_party_accepts_no_votes(): void
     {
-        [$party, $playing, $keys] = $this->impreza(4);
+        [$party, $playing, $keys] = $this->party(4);
         $party->update(['status' => 'paused']);
 
         $this->asGuest($keys[0])->postJson("/api/p/{$party->code}/skip-vote")
@@ -227,7 +227,7 @@ class SkipVoteTest extends PartyTestCase
 
     public function test_guest_state_carries_the_vote_tally(): void
     {
-        [$party, $playing, $keys] = $this->impreza(8);
+        [$party, $playing, $keys] = $this->party(8);
 
         $this->asGuest($keys[0])->postJson("/api/p/{$party->code}/skip-vote");
 
@@ -248,7 +248,7 @@ class SkipVoteTest extends PartyTestCase
      */
     public function test_the_hosts_laptop_does_not_raise_the_threshold(): void
     {
-        [$party, $playing, $keys] = $this->impreza(4);   // prog: ceil(4 * 0,75) = 3
+        [$party, $playing, $keys] = $this->party(4);   // prog: ceil(4 * 0,75) = 3
 
         // Four further people who do NOT count as the room.
         for ($i = 0; $i < 4; $i++) {
@@ -304,7 +304,7 @@ class SkipVoteTest extends PartyTestCase
      */
     public function test_the_host_can_exclude_a_guest_from_the_count(): void
     {
-        [$party, $playing, $keys, $guests] = $this->impreza(4);
+        [$party, $playing, $keys, $guests] = $this->party(4);
 
         $this->actingAs($party->user)
             ->postJson("/host/{$party->code}/api/guests/{$guests[0]->id}/in-room")
@@ -325,7 +325,7 @@ class SkipVoteTest extends PartyTestCase
 
     public function test_a_stranger_cannot_toggle_guest_counting(): void
     {
-        [$party, $playing, $keys, $guests] = $this->impreza(4);
+        [$party, $playing, $keys, $guests] = $this->party(4);
 
         $stranger = User::factory()->create();
 
@@ -343,7 +343,7 @@ class SkipVoteTest extends PartyTestCase
      */
     public function test_an_empty_room_never_yields_a_zero_threshold(): void
     {
-        [$party, $playing, $keys, $guests] = $this->impreza(4);
+        [$party, $playing, $keys, $guests] = $this->party(4);
 
         foreach ($guests as $g) {
             $g->forceFill(['last_seen_at' => now()->subMinutes(15)])->saveQuietly();
@@ -357,7 +357,7 @@ class SkipVoteTest extends PartyTestCase
 
     public function test_a_filled_room_makes_the_threshold_reachable(): void
     {
-        [$party, $playing, $keys] = $this->impreza(4);
+        [$party, $playing, $keys] = $this->party(4);
 
         // Samo odpytanie o stan odswieza obecnosc goscia.
         $this->asGuest($keys[0])->getJson("/api/p/{$party->code}/state")

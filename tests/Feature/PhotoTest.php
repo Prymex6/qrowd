@@ -27,7 +27,7 @@ class PhotoTest extends PartyTestCase
         Storage::fake('local');
     }
 
-    private function zdjecie(): UploadedFile
+    private function photo(): UploadedFile
     {
         return UploadedFile::fake()->image('party.jpg', 1600, 1200);
     }
@@ -40,7 +40,7 @@ class PhotoTest extends PartyTestCase
         [$guest, $deviceId] = $this->guestFor($party);
 
         $this->asGuest($deviceId)
-            ->postJson("/api/p/{$party->code}/photos", ['photo' => $this->zdjecie()])
+            ->postJson("/api/p/{$party->code}/photos", ['photo' => $this->photo()])
             ->assertOk()
             ->assertJson(['ok' => true, 'moderation' => false]);
 
@@ -56,7 +56,7 @@ class PhotoTest extends PartyTestCase
     {
         $party = Party::factory()->create();
 
-        $this->postJson("/api/p/{$party->code}/photos", ['photo' => $this->zdjecie()])
+        $this->postJson("/api/p/{$party->code}/photos", ['photo' => $this->photo()])
             ->assertStatus(403);
     }
 
@@ -66,7 +66,7 @@ class PhotoTest extends PartyTestCase
         [, $deviceId] = $this->guestFor($party, ['is_banned' => true]);
 
         $this->asGuest($deviceId)
-            ->postJson("/api/p/{$party->code}/photos", ['photo' => $this->zdjecie()])
+            ->postJson("/api/p/{$party->code}/photos", ['photo' => $this->photo()])
             ->assertStatus(422);
     }
 
@@ -76,7 +76,7 @@ class PhotoTest extends PartyTestCase
         [, $deviceId] = $this->guestFor($party);
 
         $this->asGuest($deviceId)
-            ->postJson("/api/p/{$party->code}/photos", ['photo' => $this->zdjecie()])
+            ->postJson("/api/p/{$party->code}/photos", ['photo' => $this->photo()])
             ->assertStatus(422);
     }
 
@@ -88,7 +88,7 @@ class PhotoTest extends PartyTestCase
         Photo::factory()->count(2)->create(['party_id' => $party->id, 'guest_id' => $guest->id]);
 
         $this->asGuest($deviceId)
-            ->postJson("/api/p/{$party->code}/photos", ['photo' => $this->zdjecie()])
+            ->postJson("/api/p/{$party->code}/photos", ['photo' => $this->photo()])
             ->assertStatus(422)
             ->assertJsonPath('error', 'Wykorzystałeś swój limit 2 zdjęć na tej imprezie.');
     }
@@ -113,7 +113,7 @@ class PhotoTest extends PartyTestCase
         [, $deviceId] = $this->guestFor($party);
 
         $this->asGuest($deviceId)
-            ->postJson("/api/p/{$party->code}/photos", ['photo' => $this->zdjecie()])
+            ->postJson("/api/p/{$party->code}/photos", ['photo' => $this->photo()])
             ->assertOk()
             ->assertJson(['moderation' => true]);
 
@@ -160,7 +160,7 @@ class PhotoTest extends PartyTestCase
         [$guest, $deviceId] = $this->guestFor($party);
 
         $this->asGuest($deviceId)
-            ->postJson("/api/p/{$party->code}/photos", ['photo' => $this->zdjecie()]);
+            ->postJson("/api/p/{$party->code}/photos", ['photo' => $this->photo()]);
 
         $photo = Photo::first();
         $path = $photo->path();
@@ -232,7 +232,7 @@ class PhotoTest extends PartyTestCase
         $party = Party::factory()->settings(['photos_on_screen' => true])->create();
         [, $deviceId] = $this->guestFor($party);
 
-        $this->asGuest($deviceId)->postJson("/api/p/{$party->code}/photos", ['photo' => $this->zdjecie()]);
+        $this->asGuest($deviceId)->postJson("/api/p/{$party->code}/photos", ['photo' => $this->photo()]);
 
         $url = $this->getJson("/api/screen/{$party->code}")->json('photos.0.url');
 
@@ -258,7 +258,7 @@ class PhotoTest extends PartyTestCase
         [$guest, $deviceId] = $this->guestFor($party);
 
         $this->asGuest($deviceId)
-            ->postJson("/api/p/{$party->code}/photos", ['photo' => $this->zdjecie()]);
+            ->postJson("/api/p/{$party->code}/photos", ['photo' => $this->photo()]);
 
         $photo = Photo::first();
 
@@ -296,7 +296,7 @@ class PhotoTest extends PartyTestCase
         [, $deviceId] = $this->guestFor($party);
 
         $this->asGuest($deviceId)
-            ->postJson("/api/p/{$party->code}/photos", ['photo' => $this->zdjecie()]);
+            ->postJson("/api/p/{$party->code}/photos", ['photo' => $this->photo()]);
 
         $this->actingAs($party->user)
             ->get("/host/{$party->code}/zdjecia.zip")
@@ -358,7 +358,7 @@ class PhotoTest extends PartyTestCase
 
         // The photo has to be created while the party is still running - a
         // closed one accepts no submissions.
-        $this->asGuest($deviceId)->postJson("/api/p/{$party->code}/photos", ['photo' => $this->zdjecie()]);
+        $this->asGuest($deviceId)->postJson("/api/p/{$party->code}/photos", ['photo' => $this->photo()]);
         $path = Photo::first()->path();
 
         $party->update(['status' => 'ended', 'ended_at' => now()->subDays(5)]);

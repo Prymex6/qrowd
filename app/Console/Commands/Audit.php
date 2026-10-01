@@ -220,7 +220,7 @@ class Audit extends Command
 
     // ------------------------------------------------------------ pomocnicze
 
-    /** Tresc metody wraz z pomocnikami, ktore wola - sprawdzenia czesto tam siedza. */
+    /** The method body plus the helpers it calls - checks often live in those. */
     private function bodyWithHelpers(string $class, string $method): string
     {
         $wez = function (string $m) use ($class): string {

@@ -80,7 +80,7 @@ class SettingsController extends Controller
             'music_source' => ['nullable', 'in:youtube,dysk'],
             'moderation' => ['nullable', 'boolean'],
             'youtube_search_budget' => ['nullable', 'integer', 'min:0', 'max:200'],
-            // zdjecia gosci
+            // guest photos
             'photos_enabled' => ['nullable', 'boolean'],
             'photo_moderation' => ['nullable', 'boolean'],
             'photos_visible_to_guests' => ['nullable', 'boolean'],

@@ -43,7 +43,7 @@ class SystemAuditTest extends PartyTestCase
         return $count;
     }
 
-    // ==================================================== izolacja imprez
+    // ================================================= isolation between parties
 
     public function test_a_guest_cannot_reach_into_another_party(): void
     {
@@ -51,14 +51,14 @@ class SystemAuditTest extends PartyTestCase
         $foreign = Party::factory()->create(['status' => 'live']);
 
         [$guest, $key] = $this->guestFor($moja);
-        $utworObcy = QueueItem::factory()->create(['party_id' => $foreign->id]);
+        $foreignTrack = QueueItem::factory()->create(['party_id' => $foreign->id]);
 
         // Hype na pozycji z cudzej imprezy.
-        $this->asGuest($key)->postJson("/api/p/{$moja->code}/queue/{$utworObcy->id}/hype")
+        $this->asGuest($key)->postJson("/api/p/{$moja->code}/queue/{$foreignTrack->id}/hype")
             ->assertNotFound();
 
         // The same device id at somebody else's party is NOT that guest.
-        $this->asGuest($key)->postJson("/api/p/{$foreign->code}/queue/{$utworObcy->id}/hype")
+        $this->asGuest($key)->postJson("/api/p/{$foreign->code}/queue/{$foreignTrack->id}/hype")
             ->assertForbidden();
     }
 
@@ -102,7 +102,7 @@ class SystemAuditTest extends PartyTestCase
         $this->assertSame('playing', $playing->fresh()->status);
     }
 
-    // ==================================================== liczba zapytan
+    // ============================================================ query counts
 
     /**
      * The guest state goes out every twenty seconds from every phone in the room.
@@ -120,7 +120,7 @@ class SystemAuditTest extends PartyTestCase
             $this->asGuest($key)->getJson("/api/p/{$party->code}/state");
         });
 
-        // Dorzucamy pietnascie pozycji, kazda od innego goscia.
+        // Fifteen entries, each from a different guest.
         for ($i = 0; $i < 15; $i++) {
             [$g] = $this->guestFor($party);
             QueueItem::factory()->create(['party_id' => $party->id, 'guest_id' => $g->id]);
@@ -186,7 +186,7 @@ class SystemAuditTest extends PartyTestCase
             ->assertStatus(422);
 
         $this->asGuest($key)
-            ->postJson("/api/p/{$party->code}/photos", ['photo' => $this->zdjecie()])
+            ->postJson("/api/p/{$party->code}/photos", ['photo' => $this->photo()])
             ->assertStatus(422);
     }
 
@@ -220,7 +220,7 @@ class SystemAuditTest extends PartyTestCase
             $body = file_get_contents($file->getPathname());
 
             if (str_ends_with($file->getPathname(), 'PartySettings.php')) {
-                // Bierzemy tylko metody, z pominieciem tablicy domyslnych.
+                // Methods only, skipping the table of defaults.
                 $body = substr($body, strpos($body, 'public function __construct'));
             }
 
@@ -326,10 +326,10 @@ class SystemAuditTest extends PartyTestCase
         [$guest, $key] = $this->guestFor($party);
 
         $this->asGuest($key)->postJson("/api/p/{$party->code}/photos",
-            ['photo' => $this->zdjecie()])->assertOk();
+            ['photo' => $this->photo()])->assertOk();
 
-        // path() jest wzgledna wobec dysku - do sprawdzen na plikach
-        // potrzebna jest systemowa.
+        // path() is relative to the disk; checking the file itself needs the
+        // one the operating system knows.
         $path = Storage::path(Photo::first()->path());
         $directory = Storage::path(Photo::directory($party));
 
@@ -418,7 +418,7 @@ class SystemAuditTest extends PartyTestCase
         $this->travelTo(CarbonImmutable::parse('2026-09-10 12:00', 'Europe/Warsaw'));
         $beforeReset = $guard->quotaDate();
 
-        // Po 9:00 naszego czasu zaczyna sie nowa doba limitu.
+        // A new quota day starts after 09:00 local time.
         $this->travelTo(CarbonImmutable::parse('2026-09-10 09:30', 'Europe/Warsaw'));
         $afterReset = $guard->quotaDate();
 
@@ -442,7 +442,7 @@ class SystemAuditTest extends PartyTestCase
         [$guest, $key] = $this->guestFor($party);
 
         $this->asGuest($key)->postJson("/api/p/{$party->code}/photos",
-            ['photo' => $this->zdjecie()])->assertOk();
+            ['photo' => $this->photo()])->assertOk();
 
         $path = Storage::path(Photo::first()->path());
         $this->assertFileExists($path);
@@ -462,7 +462,7 @@ class SystemAuditTest extends PartyTestCase
         [$guest, $key] = $this->guestFor($party);
 
         $this->asGuest($key)->postJson("/api/p/{$party->code}/photos",
-            ['photo' => $this->zdjecie()])->assertOk();
+            ['photo' => $this->photo()])->assertOk();
 
         $this->artisan('photos:cleanup')->assertSuccessful();
 
@@ -533,7 +533,7 @@ class SystemAuditTest extends PartyTestCase
     }
 
     /** Pomocnik: najmniejszy poprawny plik JPEG. */
-    private function zdjecie()
+    private function photo()
     {
         return UploadedFile::fake()->image('foto.jpg', 800, 600);
     }

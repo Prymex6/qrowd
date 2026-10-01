@@ -46,7 +46,7 @@ function zamontuj() {
     return mount(Zdjecia, { props: { code: '44S3NB', csrf: () => 'token-csrf' } });
 }
 
-/** Pole aparatu jest pierwsze, pole galerii drugie. */
+/** The camera input comes first, the gallery input second. */
 const poleGalerii = (w) => w.findAll('input[type="file"]')[1];
 const poleAparatu = (w) => w.findAll('input[type="file"]')[0];
 

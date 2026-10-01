@@ -22,7 +22,7 @@ return new class extends Migration
 
             $table->unsignedSmallInteger('hype_count')->default(0);
 
-            // Wyliczany przez RankingEngine: hype + starzenie - kary.
+            // Worked out by RankingEngine: hype plus ageing, minus the penalties.
             $table->decimal('score', 10, 3)->default(0);
 
             $table->enum('status', [

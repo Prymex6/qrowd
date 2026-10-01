@@ -56,7 +56,7 @@ class TrackTitle
         return [$channel ? self::tidyName(self::cleanChannel($channel)) : null, self::tidyName($title)];
     }
 
-    /** Usuwa nawiasy z dopiskami, roczniki, emoji i nadmiarowe spacje. */
+    /** Strips bracketed notes, years, emoji and runs of spaces. */
     public static function clean(string $title): string
     {
         // We keep letters, digits, spaces and ordinary punctuation. Everything

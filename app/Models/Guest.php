@@ -59,7 +59,7 @@ class Guest extends Model
         return $this->queueItems()->whereIn('status', ['pending', 'queued', 'playing'])->count();
     }
 
-    /** Ile wrzucil przez caly wieczor - do limitu calkowitego. */
+    /** How many they added across the whole evening - for the overall limit. */
     public function totalSubmissions(): int
     {
         return $this->queueItems()->whereNotIn('status', ['vetoed'])->count();

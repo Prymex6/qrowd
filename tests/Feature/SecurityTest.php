@@ -14,8 +14,8 @@ class SecurityTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * Gdyby is_admin bylo w $fillable, wystarczyloby dorzucic je do
-     * formularza rejestracji, zeby zrobic sobie konto administratora.
+     * If is_admin were in \$fillable, adding it to the registration form
+     * would be enough to hand yourself an administrator account.
      */
     public function test_the_admin_flag_cannot_be_mass_assigned(): void
     {

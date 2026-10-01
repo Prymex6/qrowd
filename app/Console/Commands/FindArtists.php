@@ -105,11 +105,11 @@ class FindArtists extends Command
             $cost += QuotaGuard::COST['videos'];
 
             $data = $playlisty[$channel['channel_id']] ?? null;
-            $dodane = 0;
+            $added = 0;
 
             if ($data) {
                 $stats = $importer->importPlaylist($data['playlist'], null, true, $limit);
-                $dodane = $stats['added'];
+                $added = $stats['added'];
                 $cost += $stats['units'];
             }
 
@@ -118,7 +118,7 @@ class FindArtists extends Command
                 'channel_title' => $channel['title'],
                 'uploads_playlist' => $data['playlist'] ?? null,
                 'status' => $data ? 'imported' : 'found',
-                'imported_tracks' => $dodane,
+                'imported_tracks' => $added,
                 'unit_cost' => $cost,
                 'searched_at' => now(),
             ]);
@@ -126,13 +126,13 @@ class FindArtists extends Command
             $this->line(sprintf('  [%s] %-30s <fg=green>+%d</> <fg=gray>(%s, %d j.)</>',
                 now()->format('H:i:s'),
                 mb_substr($artistName->name, 0, 30),
-                $dodane,
+                $added,
                 mb_substr($channel['title'], 0, 24),
                 $cost
             ));
 
             $total['found']++;
-            $total['tracks'] += $dodane;
+            $total['tracks'] += $added;
             $total['units'] += $cost;
 
             if ($gap > 0) {

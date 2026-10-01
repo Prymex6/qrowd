@@ -158,7 +158,7 @@ class HarvestArtists extends Command
         return self::SUCCESS;
     }
 
-    /** @return array<int, string> znormalizowane nazwy wykonawcow z folderu */
+    /** @return array<int, string> normalised artist names taken from the folder */
     private function wykonawcyZFolderu(string $folder): array
     {
         if (! is_dir($folder)) {
