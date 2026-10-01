@@ -10,12 +10,12 @@
          ekran bez paska adresu, obsluga braku sieci. Bez sklepu z aplikacjami,
          bo pijany gosc o drugiej w nocy nie zainstaluje aplikacji - kliknie link. --}}
     <link rel="manifest" href="/manifest.webmanifest">
-    <link rel="icon" type="image/png" sizes="192x192" href="/ikony/ikona-192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="/ikony/ikona-512.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
 
     {{-- iPhone ignoruje manifest przy ikonach i trybie pelnoekranowym -
          czyta wylacznie wlasne znaczniki. --}}
-    <link rel="apple-touch-icon" href="/ikony/apple-touch-icon.png">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="QRowd">
